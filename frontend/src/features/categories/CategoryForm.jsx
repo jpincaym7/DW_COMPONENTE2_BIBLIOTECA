@@ -1,0 +1,77 @@
+import { useState } from 'react';
+import { createCategorySchema } from '@biblioteca/shared';
+
+import { Alert } from '../../components/ui/Alert.jsx';
+import { Button } from '../../components/ui/Button.jsx';
+import { FormField } from '../../components/ui/FormField.jsx';
+import { Input } from '../../components/ui/Input.jsx';
+import { Textarea } from '../../components/ui/Textarea.jsx';
+import { useForm } from '../../hooks/useForm.js';
+import { getFieldErrors } from '../../utils/errorMessage.js';
+import styles from '../../styles/features/shared/FormLayout.module.css';
+
+export const EMPTY_CATEGORY = { name: '', description: '' };
+
+export const CategoryForm = ({ initialValues, submitLabel, onSubmit, onCancel }) => {
+  const [globalError, setGlobalError] = useState(null);
+
+  const { values, errors, isSubmitting, handleChange, handleBlur, handleSubmit, setErrors } = useForm({
+    initialValues,
+    schema: createCategorySchema,
+    onSubmit: async (data) => {
+      setGlobalError(null);
+
+      try {
+        await onSubmit(data);
+      } catch (apiError) {
+        const fieldErrors = getFieldErrors(apiError.errors);
+
+        if (Object.keys(fieldErrors).length > 0) {
+          setErrors(fieldErrors);
+        } else {
+          setGlobalError(apiError.message);
+        }
+      }
+    }
+  });
+
+  return (
+    <form className={styles.form} onSubmit={handleSubmit} noValidate>
+      {globalError ? <Alert variant="danger">{globalError}</Alert> : null}
+
+      <FormField label="Nombre" name="name" error={errors.name} required>
+        {(fieldProps) => (
+          <Input
+            {...fieldProps}
+            placeholder="Nombre de la categoria"
+            value={values.name}
+            onChange={handleChange}
+            onBlur={handleBlur}
+          />
+        )}
+      </FormField>
+
+      <FormField label="Descripcion" name="description" error={errors.description}>
+        {(fieldProps) => (
+          <Textarea
+            {...fieldProps}
+            rows={3}
+            placeholder="Descripcion breve de la categoria"
+            value={values.description}
+            onChange={handleChange}
+            onBlur={handleBlur}
+          />
+        )}
+      </FormField>
+
+      <div className={styles.actions}>
+        <Button variant="secondary" onClick={onCancel} disabled={isSubmitting}>
+          Cancelar
+        </Button>
+        <Button type="submit" isLoading={isSubmitting}>
+          {submitLabel}
+        </Button>
+      </div>
+    </form>
+  );
+};
