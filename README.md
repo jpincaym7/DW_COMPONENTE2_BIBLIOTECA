@@ -197,7 +197,9 @@ La coleccion cubre el camino feliz y **tambien los casos de error**: 401 sin tok
 
 El prototipo de Figma y el sistema de diseno estan documentados en [docs/figma.md](docs/figma.md).
 
-La aplicacion incluye una ruta interna `/styleguide` que renderiza **todos** los componentes del kit con sus variantes, tamanios y estados. Es el espejo del frame de Design System de Figma y sirve para detectar cualquier incoherencia visual de un vistazo.
+La aplicacion incluye una seccion de administracion, **Sistema de diseno** (`/admin/design-system`), que documenta la interfaz desde dentro de la propia aplicacion: la paleta completa, la escala tipografica, el espaciado, las formas, las capas, la iconografia y **todos** los componentes del kit con sus variantes, tamanios y estados.
+
+No es una maqueta: la pagina **lee los valores reales de los tokens en tiempo de ejecucion** con `getComputedStyle`, de modo que no puede desincronizarse de `styles/base/variables.css`. Si alguien cambia un token, la documentacion cambia con el. Es el espejo del frame de Design System de Figma y el sitio donde se detecta de un vistazo que dos componentes no combinan.
 
 ### Reglas del sistema de diseno
 

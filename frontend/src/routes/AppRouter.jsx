@@ -9,13 +9,13 @@ import { BookFormPage } from '../pages/BookFormPage.jsx';
 import { BooksPage } from '../pages/BooksPage.jsx';
 import { CategoriesPage } from '../pages/CategoriesPage.jsx';
 import { DashboardPage } from '../pages/DashboardPage.jsx';
+import { DesignSystemPage } from '../pages/DesignSystemPage.jsx';
 import { ForbiddenPage } from '../pages/ForbiddenPage.jsx';
 import { LoansAdminPage } from '../pages/LoansAdminPage.jsx';
 import { LoginPage } from '../pages/LoginPage.jsx';
 import { MyLoansPage } from '../pages/MyLoansPage.jsx';
 import { NotFoundPage } from '../pages/NotFoundPage.jsx';
 import { RegisterPage } from '../pages/RegisterPage.jsx';
-import { StyleguidePage } from '../pages/StyleguidePage.jsx';
 import { UsersPage } from '../pages/UsersPage.jsx';
 import { ProtectedRoute, PublicRoute } from './ProtectedRoute.jsx';
 import { PATHS } from './paths.js';
@@ -35,7 +35,6 @@ export const AppRouter = () => (
         <Route path={PATHS.BOOKS} element={<BooksPage />} />
         <Route path={PATHS.BOOK_DETAIL()} element={<BookDetailPage />} />
         <Route path={PATHS.MY_LOANS} element={<MyLoansPage />} />
-        <Route path={PATHS.STYLEGUIDE} element={<StyleguidePage />} />
         <Route path={PATHS.FORBIDDEN} element={<ForbiddenPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
@@ -49,6 +48,7 @@ export const AppRouter = () => (
         <Route path={PATHS.ADMIN_CATEGORIES} element={<CategoriesPage />} />
         <Route path={PATHS.ADMIN_AUTHORS} element={<AuthorsPage />} />
         <Route path={PATHS.ADMIN_USERS} element={<UsersPage />} />
+        <Route path={PATHS.ADMIN_DESIGN_SYSTEM} element={<DesignSystemPage />} />
       </Route>
     </Route>
   </Routes>

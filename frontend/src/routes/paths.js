@@ -11,6 +11,6 @@ export const PATHS = {
   ADMIN_CATEGORIES: '/admin/categories',
   ADMIN_AUTHORS: '/admin/authors',
   ADMIN_USERS: '/admin/users',
-  STYLEGUIDE: '/styleguide',
+  ADMIN_DESIGN_SYSTEM: '/admin/design-system',
   FORBIDDEN: '/403'
 };

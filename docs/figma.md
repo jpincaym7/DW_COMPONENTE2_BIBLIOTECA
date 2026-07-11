@@ -53,9 +53,13 @@ Cada token de Figma tiene su contraparte exacta en `frontend/src/styles/base/var
 
 Si algo se ve distinto en el navegador que en Figma, uno de los dos esta mal y se corrige. No se acepta la divergencia.
 
-## La ruta /styleguide
+## La seccion Sistema de diseno
 
-La aplicacion incluye una ruta interna, `/styleguide`, que renderiza **todos** los componentes del kit con todas sus variantes, tamanos y estados, uno al lado de otro.
+La aplicacion incluye una seccion de administracion, **Sistema de diseno** (`/admin/design-system`), accesible desde el menu lateral con el rol de administrador.
+
+Documenta la interfaz desde dentro de la propia aplicacion: la paleta completa con sus valores, la escala tipografica, el espaciado, los radios, las sombras, las capas de superposicion, las alturas de control, la iconografia y **todos** los componentes del kit con todas sus variantes, tamanos y estados, incluidos los de carga, error y vacio.
+
+No es una maqueta estatica. La pagina **lee los valores reales de los tokens en tiempo de ejecucion** con `getComputedStyle` sobre el elemento raiz, asi que la documentacion no puede desincronizarse del codigo: si alguien cambia `--color-primary`, la pagina lo refleja de inmediato.
 
 Es el espejo del frame de sistema de diseno de Figma. Abrir ambos en paralelo y compararlos es la forma de detectar, de un vistazo, que dos componentes no combinan entre si.
 

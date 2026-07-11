@@ -14,7 +14,8 @@ const ADMIN_LINKS = [
   { to: PATHS.ADMIN_LOANS, label: 'Prestamos', icon: 'inbox' },
   { to: PATHS.ADMIN_CATEGORIES, label: 'Categorias', icon: 'tag' },
   { to: PATHS.ADMIN_AUTHORS, label: 'Autores', icon: 'user' },
-  { to: PATHS.ADMIN_USERS, label: 'Usuarios', icon: 'users' }
+  { to: PATHS.ADMIN_USERS, label: 'Usuarios', icon: 'users' },
+  { to: PATHS.ADMIN_DESIGN_SYSTEM, label: 'Sistema de diseno', icon: 'layers' }
 ];
 
 const SidebarLink = ({ to, label, icon, end = false, onNavigate }) => (
