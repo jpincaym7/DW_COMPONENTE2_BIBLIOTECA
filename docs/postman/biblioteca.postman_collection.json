@@ -1,0 +1,1050 @@
+{
+  "info": {
+    "_postman_id": "c2c2b0d0-2222-4b22-9b22-000000000002",
+    "name": "Biblioteca API",
+    "description": "Coleccion completa de la API del sistema de gestion de biblioteca. Incluye el camino feliz y los casos de error (401, 403, 400, 404, 409).\n\nOrden de uso: ejecute la carpeta 00 - Autenticacion primero. El login guarda automaticamente los tokens en el entorno.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('La respuesta sigue el contrato de la API', function () {",
+          "  const body = pm.response.json();",
+          "  pm.expect(body).to.have.property('success');",
+          "  pm.expect(body).to.have.property('message');",
+          "});"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "00 - Autenticacion",
+      "item": [
+        {
+          "name": "Registrar usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.test('Entrega el token', () => pm.expect(body.data.token).to.be.a('string'));",
+                  "pm.test('No expone la contrasena', () => pm.expect(body.data.user.password).to.be.undefined);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Lector Nuevo\",\n  \"email\": \"lector.nuevo@biblioteca.com\",\n  \"password\": \"Lector1234\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Registrar correo duplicado (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 409', () => pm.response.to.have.status(409));"]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Lector Repetido\",\n  \"email\": \"lector.nuevo@biblioteca.com\",\n  \"password\": \"Lector1234\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Registrar con contrasena debil (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Detalla el error por campo', () => pm.expect(pm.response.json().errors.length).to.be.above(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Lector Debil\",\n  \"email\": \"lector.debil@biblioteca.com\",\n  \"password\": \"abc\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Login administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.environment.set('token', body.data.token);",
+                  "pm.environment.set('adminToken', body.data.token);",
+                  "pm.test('El rol es administrador', () => pm.expect(body.data.user.role).to.eql('admin'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Login usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.environment.set('userToken', body.data.token);",
+                  "pm.environment.set('userId', body.data.user._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Login con credenciales incorrectas (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 401', () => pm.response.to.have.status(401));"]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"ClaveIncorrecta1\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Perfil autenticado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Devuelve el usuario', () => pm.expect(pm.response.json().data.user.email).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          }
+        },
+        {
+          "name": "Perfil sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 401', () => pm.response.to.have.status(401));"]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 - Categorias",
+      "item": [
+        {
+          "name": "Listar categorias",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Incluye paginacion', () => pm.expect(body.meta).to.have.property('totalPages'));",
+                  "if (body.data.length > 0) { pm.environment.set('categoryId', body.data[0]._id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear categoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('categoryId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ensayo\",\n  \"description\": \"Obras de reflexion y analisis\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] }
+          }
+        },
+        {
+          "name": "Crear categoria duplicada (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 409', () => pm.response.to.have.status(409));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ensayo\",\n  \"description\": \"Categoria repetida\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] }
+          }
+        },
+        {
+          "name": "Crear categoria como usuario (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 403', () => pm.response.to.have.status(403));"]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Categoria no permitida\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] }
+          }
+        },
+        {
+          "name": "Actualizar categoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Descripcion actualizada desde Postman\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", "{{categoryId}}"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar categoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", "{{categoryId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Autores",
+      "item": [
+        {
+          "name": "Listar autores",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "if (body.data.length > 0) { pm.environment.set('authorId', body.data[0]._id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/authors", "host": ["{{baseUrl}}"], "path": ["authors"] }
+          }
+        },
+        {
+          "name": "Crear autor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('authorId', pm.response.json().data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jorge Luis Borges\",\n  \"nationality\": \"Argentina\",\n  \"birthYear\": 1899\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/authors", "host": ["{{baseUrl}}"], "path": ["authors"] }
+          }
+        },
+        {
+          "name": "Actualizar autor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nationality\": \"Argentina\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/authors/{{authorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["authors", "{{authorId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Libros",
+      "item": [
+        {
+          "name": "Listar libros",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Incluye paginacion', () => pm.expect(body.meta).to.have.property('total'));",
+                  "pm.test('Incluye autor poblado', () => { if (body.data.length > 0) pm.expect(body.data[0].author).to.have.property('name'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/books?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["books"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar libros con busqueda y filtros",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/books?q=clean&available=true&page=1&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["books"],
+              "query": [
+                { "key": "q", "value": "clean" },
+                { "key": "available", "value": "true" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "5" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear libro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.environment.set('bookId', body.data._id);",
+                  "pm.test('El ISBN se normaliza sin guiones', () => pm.expect(body.data.isbn).to.eql('9788420633114'));",
+                  "pm.test('availableCopies inicia igual a totalCopies', () => pm.expect(body.data.availableCopies).to.eql(body.data.totalCopies));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Ficciones\",\n  \"isbn\": \"978-84-206-3311-4\",\n  \"author\": \"{{authorId}}\",\n  \"category\": \"{{categoryId}}\",\n  \"publisher\": \"Alianza Editorial\",\n  \"publicationYear\": 1944,\n  \"description\": \"Coleccion de cuentos de Jorge Luis Borges\",\n  \"totalCopies\": 2\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] }
+          }
+        },
+        {
+          "name": "Crear libro sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 401', () => pm.response.to.have.status(401));"]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Libro sin autorizacion\",\n  \"isbn\": \"9780306406157\",\n  \"author\": \"{{authorId}}\",\n  \"category\": \"{{categoryId}}\",\n  \"publicationYear\": 2020,\n  \"totalCopies\": 1\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] }
+          }
+        },
+        {
+          "name": "Crear libro como usuario (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 403', () => pm.response.to.have.status(403));"]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Libro no permitido\",\n  \"isbn\": \"9780306406157\",\n  \"author\": \"{{authorId}}\",\n  \"category\": \"{{categoryId}}\",\n  \"publicationYear\": 2020,\n  \"totalCopies\": 1\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] }
+          }
+        },
+        {
+          "name": "Crear libro con ISBN duplicado (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 409', () => pm.response.to.have.status(409));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Ficciones repetido\",\n  \"isbn\": \"9788420633114\",\n  \"author\": \"{{authorId}}\",\n  \"category\": \"{{categoryId}}\",\n  \"publicationYear\": 1944,\n  \"totalCopies\": 1\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] }
+          }
+        },
+        {
+          "name": "Crear libro con datos invalidos (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Reporta el campo isbn', () => pm.expect(pm.response.json().errors.some((item) => item.field === 'isbn')).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"X\",\n  \"isbn\": \"123\",\n  \"author\": \"{{authorId}}\",\n  \"category\": \"{{categoryId}}\",\n  \"publicationYear\": 3000,\n  \"totalCopies\": 0\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/books", "host": ["{{baseUrl}}"], "path": ["books"] }
+          }
+        },
+        {
+          "name": "Obtener libro por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/books/{{bookId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["books", "{{bookId}}"]
+            }
+          }
+        },
+        {
+          "name": "Obtener libro con id invalido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 400', () => pm.response.to.have.status(400));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/books/identificador-invalido",
+              "host": ["{{baseUrl}}"],
+              "path": ["books", "identificador-invalido"]
+            }
+          }
+        },
+        {
+          "name": "Obtener libro inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 404', () => pm.response.to.have.status(404));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/books/507f1f77bcf86cd799439011",
+              "host": ["{{baseUrl}}"],
+              "path": ["books", "507f1f77bcf86cd799439011"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar libro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 200', () => pm.response.to.have.status(200));",
+                  "pm.test('El titulo cambio', () => pm.expect(pm.response.json().data.title).to.eql('Ficciones (edicion revisada)'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Ficciones (edicion revisada)\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/books/{{bookId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["books", "{{bookId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Prestamos",
+      "item": [
+        {
+          "name": "Crear prestamo (usuario)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('loanId', pm.response.json().data._id);",
+                  "pm.test('El estado inicial es activo', () => pm.expect(pm.response.json().data.status).to.eql('active'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"book\": \"{{bookId}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/loans", "host": ["{{baseUrl}}"], "path": ["loans"] }
+          }
+        },
+        {
+          "name": "Crear prestamo duplicado del mismo libro (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 409', () => pm.response.to.have.status(409));"]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"book\": \"{{bookId}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/loans", "host": ["{{baseUrl}}"], "path": ["loans"] }
+          }
+        },
+        {
+          "name": "Mis prestamos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Devuelve al menos un prestamo', () => pm.expect(pm.response.json().data.length).to.be.above(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/loans/me", "host": ["{{baseUrl}}"], "path": ["loans", "me"] }
+          }
+        },
+        {
+          "name": "Listar todos los prestamos (administrador)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/loans?status=active&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["loans"],
+              "query": [
+                { "key": "status", "value": "active" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar todos los prestamos como usuario (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 403', () => pm.response.to.have.status(403));"]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/loans", "host": ["{{baseUrl}}"], "path": ["loans"] }
+          }
+        },
+        {
+          "name": "Registrar devolucion (administrador)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 200', () => pm.response.to.have.status(200));",
+                  "pm.test('El prestamo queda devuelto', () => pm.expect(pm.response.json().data.status).to.eql('returned'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/loans/{{loanId}}/return",
+              "host": ["{{baseUrl}}"],
+              "path": ["loans", "{{loanId}}", "return"]
+            }
+          }
+        },
+        {
+          "name": "Registrar devolucion dos veces (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 409', () => pm.response.to.have.status(409));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/loans/{{loanId}}/return",
+              "host": ["{{baseUrl}}"],
+              "path": ["loans", "{{loanId}}", "return"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Usuarios",
+      "item": [
+        {
+          "name": "Listar usuarios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Ningun usuario expone su contrasena', () => pm.expect(pm.response.json().data.every((item) => item.password === undefined)).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar usuarios como usuario estandar (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 403', () => pm.response.to.have.status(403));"]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] }
+          }
+        },
+        {
+          "name": "Cambiar rol de usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"role\": \"user\"\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/role",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}", "role"]
+            }
+          }
+        },
+        {
+          "name": "Cambiar estado de usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"isActive\": true\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Estadisticas",
+      "item": [
+        {
+          "name": "Resumen del administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Devuelve 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye los totales', () => pm.expect(pm.response.json().data).to.have.property('totalBooks'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/stats/summary", "host": ["{{baseUrl}}"], "path": ["stats", "summary"] }
+          }
+        },
+        {
+          "name": "Resumen del administrador como usuario (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 403', () => pm.response.to.have.status(403));"]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/stats/summary", "host": ["{{baseUrl}}"], "path": ["stats", "summary"] }
+          }
+        },
+        {
+          "name": "Mi resumen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/stats/me", "host": ["{{baseUrl}}"], "path": ["stats", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Cierre de sesion",
+      "item": [
+        {
+          "name": "Cerrar sesion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Devuelve 200', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/auth/logout", "host": ["{{baseUrl}}"], "path": ["auth", "logout"] }
+          }
+        }
+      ]
+    }
+  ]
+}
