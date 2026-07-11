@@ -1,0 +1,36 @@
+.cover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-400);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sm {
+  height: var(--cover-height-sm);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.md {
+  height: var(--cover-height-md);
+}
+
+.lg {
+  height: var(--cover-height-lg);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+@media (max-width: 48rem) {
+  .lg {
+    height: var(--cover-height-lg-compact);
+  }
+}

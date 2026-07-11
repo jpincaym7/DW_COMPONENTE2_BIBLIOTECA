@@ -1,0 +1,59 @@
+.container {
+  position: fixed;
+  top: var(--space-6);
+  right: var(--space-6);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(var(--toast-width), calc(100vw - var(--space-8)));
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--font-size-sm);
+  animation: slideIn var(--transition-base) var(--easing-standard);
+}
+
+.message {
+  flex: 1;
+  color: var(--color-text);
+}
+
+.success .icon {
+  color: var(--color-success);
+}
+
+.danger .icon {
+  color: var(--color-danger);
+}
+
+.info .icon {
+  color: var(--color-info);
+}
+
+.warning .icon {
+  color: var(--color-warning);
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(var(--space-4));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

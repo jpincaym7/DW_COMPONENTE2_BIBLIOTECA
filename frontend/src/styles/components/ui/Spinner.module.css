@@ -1,0 +1,36 @@
+.spinner {
+  display: inline-block;
+  border-radius: var(--radius-full);
+  border: var(--border-width-thick) solid currentColor;
+  border-top-color: transparent;
+  animation: rotate 600ms linear infinite;
+}
+
+.sm {
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+.md {
+  width: var(--space-6);
+  height: var(--space-6);
+}
+
+.lg {
+  width: var(--space-10);
+  height: var(--space-10);
+}
+
+.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-10);
+  color: var(--color-text-muted);
+}
+
+@keyframes rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
