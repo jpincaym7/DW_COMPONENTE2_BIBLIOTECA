@@ -1,0 +1,22 @@
+{
+  "name": "biblioteca",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Sistema de gestion de biblioteca",
+  "workspaces": [
+    "shared",
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev --workspace backend",
+    "dev:web": "npm run dev --workspace frontend",
+    "seed": "npm run seed --workspace backend",
+    "build": "npm run build --workspace frontend",
+    "lint": "eslint ."
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,69 @@
+# Dependencias
+# Se instalan con "npm install" en la raiz. Nunca se suben al repositorio.
+node_modules/
+.pnp
+.pnp.js
+
+# Variables de entorno
+# Contienen credenciales reales (cadena de conexion de Atlas, JWT_SECRET).
+# Los archivos .env.example SI se versionan: son la plantilla para el equipo.
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+!.env.example
+
+# Compilados y salidas de build
+dist/
+build/
+out/
+
+# Caches de herramientas
+.vite/
+.cache/
+.parcel-cache/
+.eslintcache
+.npm/
+*.tsbuildinfo
+
+# Pruebas y cobertura
+coverage/
+.nyc_output/
+
+# Registros
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editores e IDE
+# Se ignora la carpeta completa salvo la configuracion compartida del equipo.
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Archivos temporales
+*.tmp
+*.temp
+*.bak
+*.old
+*~
+
+# Subidas locales y archivos generados en tiempo de ejecucion
+uploads/
+public/uploads/
