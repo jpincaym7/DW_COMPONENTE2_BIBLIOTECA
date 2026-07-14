@@ -1,6 +1,12 @@
 .sidebar {
+  position: sticky;
+  top: var(--navbar-height);
+  align-self: flex-start;
   width: var(--sidebar-width);
+  height: calc(100vh - var(--navbar-height));
   flex-shrink: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--space-6) var(--space-4);
   background-color: var(--color-surface);
   border-right: var(--border-width) solid var(--color-border);
