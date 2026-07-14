@@ -155,6 +155,10 @@ El middleware `protect` acepta ambas vias: primero busca la cookie y, si no exis
 
 Un JWT es **stateless**: el servidor no guarda sesiones. Al cerrar sesion, el backend borra la cookie y el frontend limpia su estado, pero el token en si sigue siendo criptograficamente valido hasta que expira. Mitigarlo por completo exigiria una lista de revocacion o refresh tokens con rotacion, lo que queda fuera del alcance de este proyecto. Se documenta de forma explicita por transparencia.
 
+## Tecnologias utilizadas
+
+El documento [docs/tecnologias.md](docs/tecnologias.md) explica en detalle que se uso, donde se uso y **por que** se eligio en cada capa: backend, base de datos y frontend. Es la referencia para la sustentacion.
+
 ## Modelo de datos
 
 Cinco colecciones: `users`, `categories`, `authors`, `books` (entidad principal) y `loans`.
